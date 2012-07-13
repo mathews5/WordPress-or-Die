@@ -105,7 +105,7 @@ class WordPress_Or_Die {
 
 		$already_voted = $this->already_voted($post_id,$ip_address,$vote_type);
 
-		// Authenticate with nonce. TODO: Also restrict one vote per IP address. Make sure the buttons show as not clickable on the client side.
+		// Authenticate with nonce.
 		if ( wp_verify_nonce( $nonce, 'ajax-nonce' ) == false || $already_voted == true ) {
 		
 			echo "failed";
@@ -113,7 +113,7 @@ class WordPress_Or_Die {
 
 		}
 
-		// If the vote was positive, allocate to the positive custom field key. TODO: Add underscore prefix to hide these.
+		// If the vote was positive, allocate to the positive custom field key.
 		if($vote_type == "vote-positive") {
 
 			$votes_number = get_post_meta($post_id, 'wpordie-positive-votes', true);
