@@ -70,14 +70,14 @@ class WordPress_Or_Die {
 		// Only display a percentage if votes have been cast.
 		if(isset($percentage)) {
 			
-			$vote_markup = "<div id='polling-place' data-post-id='$post_id'><div id='polling-label'>Vote on this post</div><a href='#' id='vote-negative'>$vote_negative</a><div id='polling-percentage'><div id='percentage-filled' style='width: $percentage%;'><span>$percentage%</span></div></div><a href='#' id='vote-positive'>$vote_positive</a></form>";
+			$vote_markup = "<div id='polling-place' data-post-id='$post_id'><div id='polling-label'>Vote on this post</div><a href='#' id='vote-negative'>$vote_negative</a><div id='polling-percentage'><div id='percentage-filled' style='width: $percentage%;'><span>$percentage%</span></div></div><a href='#' id='vote-positive'>$vote_positive</a></div>";
 		
 		}
 
 		// If there are no votes, display empty elements so that jQuery can fill in from the first vote.
 		else {
 			
-			$vote_markup = "<div id='polling-place' data-post-id='$post_id'><div id='polling-label'>Vote on this post</div><a href='#' id='vote-negative'>$vote_negative</a><div id='polling-percentage'><div id='percentage-filled'><span></span></div></div><a href='#' id='vote-positive'>$vote_positive</a></form>";
+			$vote_markup = "<div id='polling-place' data-post-id='$post_id'><div id='polling-label'>Vote on this post</div><a href='#' id='vote-negative'>$vote_negative</a><div id='polling-percentage'><div id='percentage-filled'><span></span></div></div><a href='#' id='vote-positive'>$vote_positive</a></div>";
 
 		}
 		
