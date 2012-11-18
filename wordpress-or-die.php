@@ -176,7 +176,7 @@ class WordPress_Or_Die {
 		if( ! empty( $votes_total ) ) {
 
 			// Get the percentage.
-			$percentage = $votes_positive_number / ( $votes_total * 100 );
+			$percentage = ( $votes_positive_number / $votes_total ) * 100;
 
 			// Round for simplicity.
 			$percentage = round( $percentage, 0 );
