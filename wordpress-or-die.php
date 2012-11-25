@@ -150,6 +150,11 @@ class WordPress_Or_Die {
 			}
 
 		}
+		
+		// Add a global weighted average for use in sitewide rankings.
+		$global_average = $this->weighted_average($post_id);
+		
+		update_post_meta( $post_id, 'weighted_average', $global_average );
 
 		// After adding votes, call calculate_percentage() and send the updated percentage back to the browser.
 		echo $this->calculate_percentage( $post_id );
@@ -213,6 +218,47 @@ class WordPress_Or_Die {
 	
 	}
 	
+	/**
+	 * Determines a post's true ranking on the entire site using a Bayesian weighted average. This will be used in the future for chart functions. Thanks to Eric Mann for outlining this implementation.
+	 *
+	 * @return				A weighted percentage to be stored in a seperate custom field and used for site wide sorting.
+	 */
+	function weighted_average( $post_id ) {
+	
+		global $wpdb;
+
+		$global_positive_votes = $wpdb->get_var( $wpdb->prepare( 
+			"
+				SELECT sum(meta_value) 
+				FROM $wpdb->postmeta 
+				WHERE meta_key = 'wpordie-positive-votes'
+
+			"
+		) );
+
+		$global_negative_votes = $wpdb->get_var( $wpdb->prepare( 
+			"
+				SELECT sum(meta_value) 
+				FROM $wpdb->postmeta 
+				WHERE meta_key = 'wpordie-negative-votes'
+
+			"
+		) );
+		
+		$global_votes = $global_positive_votes + $global_negative_votes;
+		
+		$global_average = $global_positive_votes / $global_votes;
+		
+		$single_positive_votes = get_post_meta( $post_id, 'wpordie-positive-votes', true );
+		
+		$single_negative_votes = get_post_meta( $post_id, 'wpordie-negative-votes', true );
+		
+		$weighted_percentage = ( $global_votes * $global_average + $single_positive_votes ) / ( $single_positive_votes + $single_negative_votes + $global_votes );
+		
+		return $weighted_percentage;
+
+	}
+
 }
 
 new WordPress_Or_Die();
