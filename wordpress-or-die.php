@@ -41,13 +41,14 @@ class WordPress_Or_Die {
 
 	// Add relevant stylesheet and javascript file.
 	public function register_plugin_styles() {
-		wp_register_style( 'wpordie-plugin-styles', plugins_url( 'wordpress-or-die/css/vote.css' ) );
+	
+		wp_register_style( 'wpordie-plugin-styles', plugins_url( 'css/vote.css', __FILE__ ) );
 		wp_enqueue_style( 'wpordie-plugin-styles' );
 	}
 
 	public function register_plugin_scripts() {
 	
-		wp_register_script( 'wpordie-vote-ajax', plugins_url( 'wordpress-or-die/js/vote.js' ), array( 'jquery' ) );
+		wp_register_script( 'wpordie-vote-ajax', plugins_url( 'js/vote.js', __FILE__ ), array( 'jquery' ) );
 		wp_enqueue_script( 'wpordie-vote-ajax' );
 		
 		wp_localize_script('wpordie-vote-ajax', 'wpordie_var', 
@@ -71,9 +72,10 @@ class WordPress_Or_Die {
 
 		// Edit these to change text. Will be editable in options page.
 		$vote_positive = "Good";
+
 		$vote_negative = "Bad";
 
-		$percentage = $this->calculate_percentage($post_id);
+		$percentage = $this->calculate_percentage( $post_id );
 
 		// Only display a percentage if votes have been cast.
 		if( isset( $percentage ) ) {
@@ -84,7 +86,7 @@ class WordPress_Or_Die {
 		} else {
 			
 			$vote_markup = "<div id='polling-place' data-post-id='$post_id'><div id='polling-label'>Vote on this post</div><a href='#' id='vote-negative'>$vote_negative</a><div id='polling-percentage'><div id='percentage-filled'><span></span></div></div><a href='#' id='vote-positive'>$vote_positive</a></div>";
-
+		
 		}
 		
 		// Check if it is a post before adding markup. Support for all content types is planned.
@@ -152,7 +154,7 @@ class WordPress_Or_Die {
 		}
 		
 		// Add a global weighted average for use in sitewide rankings.
-		$global_average = $this->weighted_average($post_id);
+		$global_average = $this->weighted_average( $post_id );
 		
 		update_post_meta( $post_id, 'weighted_average', $global_average );
 
@@ -188,6 +190,7 @@ class WordPress_Or_Die {
 
 			// Spit out an integer for use in other functions.
 			return $percentage;
+
 		}
 
 	}
@@ -219,7 +222,9 @@ class WordPress_Or_Die {
 	}
 	
 	/**
-	 * Determines a post's true ranking on the entire site using a Bayesian weighted average. This will be used in the future for chart functions. Thanks to Eric Mann for outlining this implementation.
+	 * Returns a weighted average to assign to the post, for easy sorting by site wide ranking. Thanks to Eric Mann for outlining this implementation.
+	 *
+	 * @param	$post_id	The ID of the post that we're assigned the weighted average to.
 	 *
 	 * @return				A weighted percentage to be stored in a seperate custom field and used for site wide sorting.
 	 */
@@ -231,18 +236,20 @@ class WordPress_Or_Die {
 			"
 				SELECT sum(meta_value) 
 				FROM $wpdb->postmeta 
-				WHERE meta_key = 'wpordie-positive-votes'
+				WHERE meta_key = %s
 
-			"
+			",
+			"wpordie-positive-votes"
 		) );
 
 		$global_negative_votes = $wpdb->get_var( $wpdb->prepare( 
 			"
 				SELECT sum(meta_value) 
 				FROM $wpdb->postmeta 
-				WHERE meta_key = 'wpordie-negative-votes'
+				WHERE meta_key = %s
 
-			"
+			",
+			"wpordie-negative-votes"
 		) );
 		
 		$global_votes = $global_positive_votes + $global_negative_votes;
